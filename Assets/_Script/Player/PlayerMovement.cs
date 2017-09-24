@@ -1,15 +1,14 @@
 using System;
 using UnityEngine;
+using UnityEngine.AI;
 using UnityStandardAssets.Characters.ThirdPerson;
 
+[RequireComponent(typeof(NavMeshAgent))]
 [RequireComponent(typeof(ThirdPersonCharacter))]
 public class PlayerMovement : MonoBehaviour
 {
     [SerializeField]
     ThirdPersonCharacter m_Character;
-
-    [SerializeField]
-    CameraRaycaster cameraRaycaster;
 
     [SerializeField]
     private float walkMoveStopRadius = 0.2f;
@@ -21,11 +20,42 @@ public class PlayerMovement : MonoBehaviour
 
     private static bool isInDirectionMode = false;
 
-    private void Start()
+    private AICharacterControl aiCharachteControl = null;
+    CameraRaycaster cameraRaycaster = null;
+
+    private const int walkableLayerNumber = 8;
+
+    private const int enemyLayerNumber = 9;
+
+    private GameObject walkTarget;
+
+    void Start()
     {
-        //cameraRaycaster = Camera.main.GetComponent<CameraRaycaster>();
+        cameraRaycaster = Camera.main.GetComponent<CameraRaycaster>();
         //m_Character = GetComponent<ThirdPersonCharacter>();
         currentDestination = transform.position;
+        aiCharachteControl = GetComponent<AICharacterControl>();
+        cameraRaycaster.notifyMouseClickObservers += ProcessMaouseClick;
+        Debug.Log(cameraRaycaster);
+
+        walkTarget = new GameObject("walk Target");
+    }
+
+    private void ProcessMaouseClick(RaycastHit raycastHit, int layerHit)
+    {
+        switch(layerHit)
+        {
+            case enemyLayerNumber:
+                GameObject enemy = raycastHit.collider.gameObject;
+                aiCharachteControl.SetTarget(enemy.transform);
+                break;
+            case walkableLayerNumber:
+                walkTarget.transform.position = raycastHit.point;
+                aiCharachteControl.SetTarget(walkTarget.transform);
+                break;
+            default:
+                return;
+        }
     }
 
     // Fixed update is called in sync with physics
@@ -59,26 +89,7 @@ public class PlayerMovement : MonoBehaviour
     }
 
 
-        //private void ProcessMouseMovement()
-     //{
-     //    if (Input.GetMouseButton(0))
-     //    {
-     //        clickPoint = cameraRaycaster.hit.point;
-     //        switch (cameraRaycaster.currentLayerHit)
-     //        {
-    //            case Layer.Walkable:
-     //                currentDestination = ShortDestination(clickPoint, walkMoveStopRadius);
-     //                break;
-    //            case Layer.Enemy:
-     //                currentDestination = ShortDestination(clickPoint, attackMoveStopRadius);
-     //                break;
-     //            default:
-    //                print("Unexpected layer found");
-     //                return;
-     //        }
-     //    }
-     //    WalkToDestination();
-     //}
+    
 
 
     private void WalkToDestination()
@@ -98,19 +109,6 @@ public class PlayerMovement : MonoBehaviour
     {
         Vector3 redictionVector = (destination - transform.position).normalized * shotering;
         return destination - redictionVector;
-    }
-
-    private void OnDrawGizmos()
-    {
-        Gizmos.color = Color.black;
-        Gizmos.DrawLine(transform.position, clickPoint);
-
-        Gizmos.DrawSphere(currentDestination, 0.15f);
-        Gizmos.DrawSphere(clickPoint, 0.15f);
-
-        //Draw attack
-        Gizmos.color = new Color(255f, 0.0f, 0.0f, .5f);
-        Gizmos.DrawWireSphere(transform.position, attackMoveStopRedius);
     }
 }
 
