@@ -1,8 +1,9 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Player : MonoBehaviour
+public class Player : MonoBehaviour, IDamageable
 {
     [SerializeField]
     float maxHealtPoint = 100f;
@@ -17,4 +18,8 @@ public class Player : MonoBehaviour
         }
     }
 
+    public void TakeDamage(float damage)
+    {
+        currentHealtPoint = Mathf.Clamp(currentHealtPoint - damage, 0f, maxHealtPoint);
+    }
 }

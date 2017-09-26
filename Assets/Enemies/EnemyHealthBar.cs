@@ -6,7 +6,7 @@ using UnityEngine.UI;
 public class EnemyHealthBar : MonoBehaviour
 {
     [SerializeField]
-    RawImage healthBarRawImage = null;
+    RawImage healthBarRawImage;
     Enemy enemy = null;
 
     // Use this for initialization

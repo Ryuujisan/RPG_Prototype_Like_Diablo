@@ -5,13 +5,18 @@ using UnityEngine;
 public class CameraFallow : MonoBehaviour
 {
     [SerializeField]
-    private Transform player;
-
-    [SerializeField]
     private Transform camera;
-	
-	// Update is called once per frame
-	void LateUpdate ()
+
+    Transform player;
+
+    private void Start()
+    {
+        GameObject playerGameObject = GameObject.FindGameObjectWithTag("Player");
+        player = playerGameObject.transform;
+    }
+
+    // Update is called once per frame
+    void LateUpdate ()
     {
         camera.position = player.position;
 	}
