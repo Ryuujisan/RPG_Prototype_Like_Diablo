@@ -7,6 +7,9 @@ public class CameraFallow : MonoBehaviour
     [SerializeField]
     private Transform camera;
 
+    [SerializeField]
+    private float timeLerp = 2f;
+
     Transform player;
 
     private void Start()
@@ -18,6 +21,6 @@ public class CameraFallow : MonoBehaviour
     // Update is called once per frame
     void LateUpdate ()
     {
-        camera.position = player.position;
+        camera.position = Vector3.Lerp(camera.position, player.position, timeLerp * Time.deltaTime);
 	}
 }
