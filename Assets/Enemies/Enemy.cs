@@ -21,6 +21,9 @@ public class Enemy : MonoBehaviour, IDamageable
     float shotPerSecend = 0.5f;
 
     [SerializeField]
+    Vector3 verticalAimOffset = Vector3.up;
+
+    [SerializeField]
     private GameObject ProjectileToUse;
 
     [SerializeField]
@@ -41,6 +44,7 @@ public class Enemy : MonoBehaviour, IDamageable
     {
         player = GameObject.FindGameObjectWithTag("Player");
         thirPersonCharacter = GetComponent<ThirdPersonCharacter>();
+        currentHealtPoint = maxHealtPoint;
     }
 
 
@@ -60,9 +64,11 @@ public class Enemy : MonoBehaviour, IDamageable
             CancelInvoke();
         }
 
+
+
         if (distanceToPlayer <= chaseRadius)
         {
-            ai.target = player.transform;
+            ai.target = player.transform ;
         }
         else
         {
@@ -75,7 +81,7 @@ public class Enemy : MonoBehaviour, IDamageable
         GameObject newProjectail = Instantiate(ProjectileToUse, projectailSocket.transform.position, Quaternion.identity) as GameObject;
         var projectailComponent = newProjectail.GetComponent<Projectile>().damageCount = damagePerShot;
 
-        Vector3 dir = (player.transform.position - projectailSocket.transform.position).normalized;
+        Vector3 dir = (player.transform.position + verticalAimOffset - projectailSocket.transform.position).normalized;
         newProjectail.GetComponent<Rigidbody>().velocity = dir * projectailComponent;
     }
 
@@ -91,6 +97,11 @@ public class Enemy : MonoBehaviour, IDamageable
     public void TakeDamage(float damage)
     {
         currentHealtPoint = Mathf.Clamp(currentHealtPoint - damage, 0f, maxHealtPoint);
+
+        if(currentHealtPoint <= 0)
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void OnDrawGizmos()
